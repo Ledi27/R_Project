@@ -1,0 +1,236 @@
+---
+title: "Bachelor në Inxhinieri Matematike dhe Informatike -2"
+author: 'Student: Miledi Tafa & Jona Papa, Pedagog: Ornela Gordani'
+output:
+  html_document:
+    df_print: paged
+---
+
+
+## Projekti {.tabset}
+### `r ("Hyrje")`
+
+
+$Ne$ $fillim$ $le$ $te$ $nisim$ $me$ $pak$ $informacion$ $rreth$ $“R-studio”$ $:$
+
+R-Studio është një mjedis zhvillimi i integruar për R, një gjuhë programimi për llogaritjet statistikore dhe grafikë. Ai është i disponueshëm në dy formate: RStudio Desktop është një aplikacion i zakonshëm desktop ndërsa RStudio Server funksionon në një server të largët dhe lejon hyrjen në RStudio duke përdorur një shfletues web.
+
+$R-studio$ $përfshin$ $:$
+
+• një mjet efektiv për trajtimin dhe ruajtjen e të dhënave,
+
+• një grup operatorësh për llogaritjet në vargje, në veçanti matrica,
+
+• një koleksion i madh, koherent dhe i integruar i mjeteve të ndërmjetme për analizën e të dhënave,
+
+• pajisje grafike për analizën dhe shfaqjen e të dhënave në ekran ose në kopje fizike,
+
+• një gjuhë programimi e zhvilluar mirë, e thjeshtë dhe efektive, e cila përfshin kushte, unaza, funksione rekursive të përcaktuara nga përdoruesi dhe pajisje hyrëse dhe dalëse.
+
+$Synimet$/$Qellimet$ $e$ $projektit:$
+
+1- Te shqyrtojme ne menyre statistikore dhe grafike te dhenat e databazes ne gjuhen R.
+
+2- Te jemi te afte per te evidentuar kodet e ndryshme te perdorura dhe te shpjegojme qellimin e tyre.
+
+3-Te analizojme cdo histograme ose grafik qe kemi bere ne projekt.
+
+4- Te evidentojme te gjithe funksionet dhe librarite e ndryshme qe kemi mesuar ne laboratore.
+
+
+$Librarite$ $e$ $perdorura$ $ne$ $projekt$ $jane$ $:$
+```{r}
+library(tidyverse)
+library(readxl)
+library(ggpubr)
+library(tidytext)
+library(broom)
+library(MASS)
+library(correlation)
+library(tidyr)
+library(corrplot)
+```
+
+
+### `r ("Perpunimi i te dhenave")`
+
+```{r}
+library(readxl)
+ProjektiR <- read_excel("ProjektiR.xlsx")
+head(ProjektiR, 20) # Me ane te kodit terheqim 20 rreshtat e pare.
+class(ProjektiR) # Kemi treguar cfare klase eshte database.
+summary(ProjektiR$Cmimi) # Me ane te kodit gjejme madhesite mesatare te cmimit.
+ range(ProjektiR$Cmimi) # Gjen vleren me te madhe dhe me te vogel te cmimit.
+ range(ProjektiR$`Fuqia motorrike`) # Gjen vleren me te madhe dhe me te vogel te Fuqise motorrike. 
+ diferenca = max(ProjektiR$Cmimi) - min(ProjektiR$Cmimi) #Gjen diferencen ndermjet  cmimeve(max - min).
+ mean(ProjektiR$Cmimi , na.rm = TRUE) #Gjen mesataren e cmimeve.
+ sum(ProjektiR$Cmimi) #Gjen shumen totale te cmimeve.
+ library(ggplot2)
+plot(ProjektiR$Cmimi, type = "o", col = "#00FFFF", xlab = "Number", ylab = "Cmimi") # Me ane te ketij kodi krijojme nje plot per cmimin.
+ library(ggplot2)
+plot(ProjektiR$Kilometrazhi, type = "o", col = "#8A2BE2", xlab = "Number", ylab = "Kilometrazhi") # Me ane te ketij kodi krijojme nje plot per kilometrat.
+hist(ProjektiR$`Fuqia motorrike`, xlab = "Fuqia motorrike", ylab = "Number", main = "Fuqia motorrike 
+ Histogram",col=c("black","red")) # Krijojme nje histograme per fuqin motorrike te makinave. 
+hist(ProjektiR$Kilometrazhi, xlab = "Kilometrazhi", ylab = "Number", main = "Kilometrazhi Histogram", col=c("black","blue")) # Krijojme nje histograme per kilomerat e konsumuara nga makinat. 
+plot(ProjektiR$Kilometrazhi~ProjektiR$Cmimi, main = "Cmimi vs Kilometrazhi", xlab = "Cmimi",ylab="Kilometrazhi",col=c("#008B8B","#00008B"))#Me ane te kodit tregojme lidhjen e cmimit me kilometrat e makinave.
+table(ProjektiR$'Marshi', ProjektiR$`Vit prodhimi`) #Tregojme lidhjen e llojin te marshit me vitin e prodhimit.
+which(ProjektiR$'Fuqia motorrike'>300)#Makinat te cilat e kan fuqine motorrike me te lart se 300.
+which(ProjektiR$`Fuqia motorrike`<200)#Makinat te cilat e kan fuqin mototrrike me te ulet se 200.
+table(ProjektiR$`Lenda djegese`)
+ A <- c(15244,758,28864,126)
+labels <- c("Diesel","Electric","Gasoline")
+pie(A, labels, main = "Grafiku pie per Lendet djegese kryesore", col = rainbow(length(A)))  
+print(str(ProjektiR))
+stu_data = data.frame(ProjektiR$Cmimi,ProjektiR$Kilometrazhi)      
+stu_data = table(ProjektiR$Cmimi,ProjektiR$Kilometrazhi)           
+print(chisq.test(stu_data))
+#install.packages("corrplot")
+library(corrplot)
+cor(ProjektiR[,c(1,7,8)])
+corrplot(cor(ProjektiR[,c(1,7,8)])) 
+ggplot(ProjektiR, aes(x = ProjektiR$Cmimi, y = ProjektiR$`Fuqia motorrike`))+geom_point()+labs(x="Cmimi",y="Fuqia motorike",title = "Cmimi ne lidhje me fuqine motorike per makine")
+#Grafiku ku secila shtyllë ka një ngjyrë të ndryshme dhe mbi secilën shtyllë keni numrin e markave te makinave.
+ggplot(ProjektiR, aes(x=ProjektiR$Marka, y=ProjektiR$Cmimi,fill=ProjektiR$Marka)) +geom_bar(aes(y=ProjektiR$Cmimi),stat = "identity")+geom_text(aes(label = ProjektiR$Cmimi), vjust = -0.5)
+```
+
+
+
+
+### `r ("Analiza e te dhenave")`
+
+$Madhesite$ $mesatare.$
+
+$Ne$ $database$ $kemi$ $gjetur$ $madhesite$ $mesatare$ $statistikore$ $te$ $cmimeve$ $te$ $makinave.$
+
+
+Nga perpunimi i te dhenave:
+
+
+Numri minimal i cmimit eshte 6800 .
+
+
+Kuartili i pare eshte 7924.
+
+
+Mestararja e cmimeve eshte 8990 .
+
+
+Kuartili i trete eshte 9290.
+
+
+Numri maksimal i cmimit eshte 10950 .
+
+
+Fuqia motorike minimale eshte 60 .
+
+
+Fuqia motorike maksimale eshte 204 .
+
+
+Diferenca mes cmimit maksimial dhe minimal eshte 8684.293 .
+
+
+Shuma totale e cmimeve eshte 859745.
+
+
+$Plot$ $per$ $cmimin$ $dhe$ $per$ $kilometrat$ $e$ $makinave$
+
+
+Nga database kemi krijuar nje plot per cmimin e makinave:
+
+
+Analiza e plot per cmimin: Nga grafiku analizojme se cmimi me i ulet eshte 6800, cmimi me i larte arrin tek 11000.
+
+
+$Analiza$ $e$ $plot$ $per$ $kilometrat:$
+
+
+Nga grafiku analizojme se kemi nje shperndarje thuajse te njejte midis kilometrazhit te makinave por mund te verejme se dy vlera jane me e medha se te tjerat.
+
+
+$Histogrami$ $i$ $kilometrave$ $dhe$ $i$ $powerups$ $te$ $makinave.$
+
+
+$Histogrami$ $i$ $kilometrave:$
+
+
+Nga histogrami i krijuar kemi paraqitur Fuqin Motorrike te makinave .Nga histogrami verejme se nen fuqin 100 kemi deri ne 40 makina.Kemi shperndarjen me te madhe te makinave per fuqin motorrike nga vlera 100-150.
+
+$Histogrami$ $i$ $Kilomatrazhit:$
+
+
+Nga histogrami i krijuar kemi nen 35 makina me kilometrazh nga 1e+05, kemi perafersisht deri ne 5 makina te cilat kanespecifikisht vlerat 3e+05-4e+05.
+
+
+$Lidhja$ $e$ $cmimit$ $te$ $makinave$ $me$ $kilometrat$ $e$ $tyre$
+
+
+Pikat ne grafikun e lidhjes se cmimit te makinave me kilometrat e tyre jane te shperhapura.Ndryshoret ne kete rast nuk kan nje lidhje te forte me njera tjetren.
+
+
+$Marshi$ $i$ $makinave$ $ne$ $lidhje$ $me$ $vitin$ $e$ $rregjistrimit/prodhimit$ $te$ $tyre.$
+
+
+Nga analiza e bere nxjerrim se ne total per vitet e rregjistrimit nga 2011-2016 kemi me shume makina se kamio manuale. Pra makinat me kamio manuale jane me te shumta. Viti me me shume makina manuale te rregjistruara eshte viti 2012.Viti me me shume makina automatike te rregjistruara eshte viti 2013&2015.
+
+
+$Analiza$ $e$ $Fuqis motorrike$ $te$ $makinave.$
+
+Ne tabele kemi paraqitur numrin e makinave qe e kane fuqine motorike me te madhe se 300.Ku shohim se ku vlera me te medha se 300 fuqi motorrike nuk ka.
+Ne tabele kemi paraqitur numrin e makinave qe e kane fuqine motorike me te vogel se 200.Nga ta bela shohim se kemi 85 makina me fuqi motorrike me te ulet se 200.
+
+Taela tjeter paraqet ndarjen e lendeve djegse qe perdorin makinat.Ndarja eshte benzina, nafta dhe elektrike/Benzine.
+Me te shumtat jane ato me benzine sic e paraqe tabela.
+
+$Analiza$ $e$ $grafikeve$ $pie$ $per$ $Lenden$ $Djegese.$
+
+
+Grafiku pie per lenden djegese te makinave: Pjesa me e madhe grafikut i takon benzines  , pjesa e dyte i takon naftes dhe pjesa e trete dhe me e vogla i takon  makinave elektrike.
+
+
+$Chi$ $square$ $test$
+
+
+Testi Chi-Square në R është një metodë statistikore e cila përdoret për të përcaktuar nëse dy variabla kategorikë kanë një korrelacion midis tyre.Nga vlerat e treguara mund te themi qe dy variablat qe kemi marr ne shqyrtim p-value eshte me pak se 0.06322 dhe kjo do te thote qe dy variablat jane te pavarura njera me tjetren.Vlera e chi-squared eshte 3863.9.
+
+$Lidhja$ $e$ $trefishte$ $Kilmetrazh-Cmim-Fuqi$ motorike paraqitet me ane te grafikut corrplot. Nga grafiku shohim qe kilometrazhi ka vlera me te medha dhe Fuqia motorike ka vlerat me te ulta dhe kjo verehet dhe nga ngjyrat qe ato kane.
+
+$Cmimi$ $ne$ $lidhje$ $me$ $fuqine$ $motorike$ $per$ $makine.$
+
+Nga grafiku shohim shperndarjen e fuqise motorike per cmimin e makines, denduria eshte shume e shperndar dhe nuk mnd te themi nje vlere fikse e cila ka me shume vlera apo me pak.
+
+
+$Ne$ $grafikun$ $e$ $fundit$ $kemi$ $paraqitur$ $markat$ $e$ $makinave$ $e$ $lidhje$ $me$ $cmimin.$
+Secila shtylle ka numrin e markave te makinave, ngjyra te ndyrshme paraqesin marka te ndryshme.Nga grafiku duket se Volswagen eshte marka e cila ka vleren me te madhe te cmimit ne studimin qe ne kemi marr.
+
+### `r ("Perfundime")`
+1.Ne perfundim te projektit kemi analizuar si statistikisht si grafikisht te gjithe database-n e dhene.
+
+2.Kemi mesuar me shume rreth gjuhes R.
+
+3.Kemi evidentuar te gjitha funksionet dhe librarite e ndryshme qe kemi mesuar ne oret e laboratorit.
+
+4.Kemi bere te mundur shpjegimin e cdo grafiku apo histogrami qe kemi punuar.
+
+### `r ("Referencat")`
+Disa nga referencat qe u bazuam per projektin jane:
+
+1- Seancat e laboratoreve.
+
+2-https://r4ds.had.co.nz/workflow-projects.html
+
+3-https://www.educba.com/graphs-in-r/
+
+4-http://www.sthda.com/english/wiki/creating-and-saving-graphs-r-base-graphs
+
+5-https://bookdown.org/content/4e34e34f-ca48-4090-90ca-8ae7b1b65e0e/plotting-with-r-base-code.html
+
+6-https://www.youtube.com/watch?v=Hm8Fc5HbXXQ
+
+7-https://stats.oarc.ucla.edu/r/faq/how-can-i-do-a-scatterplot-with-regression-line-or-any-other-lines/
+
+8-https://statisticsglobe.com/abline-function-in-r/
+
+9-https://www.geeksforgeeks.org/chi-square-test-in-r/
+
+10-https://search.r-project.org/CRAN/refmans/dplyr/html/count.html

@@ -1,0 +1,12 @@
+
+```{r}
+#install.packages("gapminder")
+library(gapminder)
+library(dplyr)
+View(gapminder)
+gapminder_2007<-gapminder %>% filter(year==2007)
+head(gapminder_2007)
+head(gapminder_2007)
+
+```
+
